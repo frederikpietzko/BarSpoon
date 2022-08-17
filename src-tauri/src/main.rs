@@ -2,11 +2,15 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-mod migrations;
+
 use dotenv::dotenv;
 use migrations::{Migration, MigrationManager};
 use rusqlite::Connection;
 use std::env;
+use todos::TodoRepository;
+
+mod migrations;
+mod todos;
 
 fn main() {
     dotenv().ok();
@@ -14,8 +18,8 @@ fn main() {
     let conn = Connection::open(path).unwrap();
 
     MigrationManager::new(
-        conn,
-        vec![Migration {
+        &conn,
+        &vec![Migration {
             id: 1,
             name: "Create Todo Table".to_string(),
             applied_at: "2022-08-18".to_string(),
@@ -34,4 +38,6 @@ fn main() {
     tauri::Builder::default()
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    conn.close().unwrap();
 }

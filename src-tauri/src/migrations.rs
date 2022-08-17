@@ -15,13 +15,13 @@ impl Migration {
     }
 }
 
-pub struct MigrationManager {
-    connection: Connection,
-    migrations: Vec<Migration>,
+pub struct MigrationManager<'a> {
+    connection: &'a Connection,
+    migrations: &'a Vec<Migration>,
 }
 
-impl MigrationManager {
-    pub fn new(connection: Connection, migrations: Vec<Migration>) -> Self {
+impl<'a> MigrationManager<'a> {
+    pub fn new(connection: &'a Connection, migrations: &'a Vec<Migration>) -> Self {
         Self {
             connection,
             migrations,

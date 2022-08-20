@@ -1,5 +1,6 @@
 use log::info;
-use rusqlite::Connection;
+use rusqlite::{params, Connection};
+
 pub struct Migration {
     pub id: i32,
     pub name: String,
@@ -11,6 +12,10 @@ impl Migration {
     fn apply(&self, conn: &Connection) -> Result<(), rusqlite::Error> {
         info!("Applying migration: {}", self.name);
         conn.execute(&self.sql, [])?;
+        conn.execute(
+            "INSERT INTO T_MIGRATIONS (id, name, applied_at, sql) VALUES (?, ?, ?, ?)",
+            params![&self.id, &self.name, &self.applied_at, &self.sql],
+        )?;
         Ok(())
     }
 }
